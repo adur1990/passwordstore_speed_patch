@@ -1,0 +1,16 @@
+42c42,54
+< GETOPT="$({ test -x /usr/local/opt/gnu-getopt/bin/getopt && echo /usr/local/opt/gnu-getopt; } || brew --prefix gnu-getopt 2>/dev/null || { which port &>/dev/null && echo /opt/local; } || echo /usr/local)/bin/getopt"
+---
+> get_getopt() {
+>        local GETOPT="$(PATH="/usr/local/opt/gnu-getopt/bin:/opt/local/bin:/usr/local/bin" command -v getopt)" || \
+>        local GETOPT="$(brew --prefix 2>/dev/null)/opt/gnu-getopt/bin/getopt" || \
+>        local GETOPT="$(port content getopt | grep -E '/s?bin/')"
+> 
+>        if [ ! $GETOPT ]; then
+>                echo "'getopt' is not installed. Please use 'brew' or 'port' to install it."
+>                exit 1
+>        fi
+>        echo $GETOPT
+> }
+> 
+> GETOPT=$(get_getopt)
